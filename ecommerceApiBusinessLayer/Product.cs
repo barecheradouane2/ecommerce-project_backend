@@ -47,7 +47,7 @@ namespace ecommerceApiBusinessLayer
         private bool _AddNewProduct()
         {
             this.ProductID = ProductData.AddNewProduct(this.PDTO);
-            return false;
+            return ProductID!=-1;
         }
 
         private bool _UpdateNewProduct()
