@@ -54,22 +54,67 @@ namespace ecommerce_project.Controllers
         [HttpPost( Name = "AddNewProduct")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+      
 
-        public ActionResult<ProductDTO> AddNewProduct(ProductDTO NewProductDTO)
+
+        public async Task<ActionResult<ProductDTO>> AddNewProduct([FromForm] ProductDTO NewProductDTO)
         {
-            if (NewProductDTO==null || string.IsNullOrEmpty(NewProductDTO.ProductName) ||NewProductDTO.Stock<=0)
+            // Validate the ProductDTO
+            if (NewProductDTO == null)
             {
-                return BadRequest("Invalid Product data");
+                return BadRequest("Product data is required.");
             }
-            // server side 
-            ecommerceApiBusinessLayer.Product product = new ecommerceApiBusinessLayer.Product(new ProductDTO(NewProductDTO.ProductID, NewProductDTO.ProductName, NewProductDTO.Description,NewProductDTO.Price,NewProductDTO.Discount,NewProductDTO.Stock, NewProductDTO.CategoryID, DateTime.Now));
-              
-            product.Save();
-            NewProductDTO.ProductID= product.ProductID;
-            return CreatedAtRoute("GetProductByID", new { id = NewProductDTO.ProductID }, NewProductDTO);
 
+            if (string.IsNullOrEmpty(NewProductDTO.ProductName))
+            {
+                return BadRequest("Product name is required.");
+            }
+
+            if (NewProductDTO.Stock <= 0)
+            {
+                return BadRequest("Stock must be greater than zero.");
+            }
 
          
+
+            try
+            {
+                // Create a product object
+                var product = new ecommerceApiBusinessLayer.Product(
+                    new ProductDTO(
+                        NewProductDTO.ProductID,
+                        NewProductDTO.ProductName,
+                        NewProductDTO.Description,
+                        NewProductDTO.Price,
+                        NewProductDTO.Discount,
+                        NewProductDTO.Stock,
+                        NewProductDTO.CategoryID,
+                        DateTime.Now,
+                        NewProductDTO.ProductImage
+                    )
+                );
+
+                // Save the product
+                bool isSaved = await product.Save();
+                if (!isSaved)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Failed to save the product.");
+                }
+
+                // Set the generated ProductID back to the DTO
+                NewProductDTO.ProductID = product.ProductID;
+
+                // Return a CreatedAtRoute response
+                return CreatedAtRoute("GetProductByID", new { id = NewProductDTO.ProductID }, NewProductDTO);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (replace with your logger)
+                Console.WriteLine($"Error while adding product: {ex.Message}");
+
+                // Return an error response
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing the request.");
+            }
         }
 
 
@@ -150,35 +195,7 @@ namespace ecommerce_project.Controllers
 
 
 
-        [HttpPost("Upload")]
-        public async Task<IActionResult> UploadImage(IFormFile imageFile)
-        {
-            // Check if no file is uploaded
-            if (imageFile == null || imageFile.Length == 0)
-                return BadRequest("No file uploaded.");
-
-            // Directory where files will be uploaded
-            var uploadDirectory = @"C:\MyUploads";
-
-            // Generate a unique filename
-            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
-            var filePath = Path.Combine(uploadDirectory, fileName);
-
-            // Ensure the uploads directory exists, create if it doesn't
-            if (!Directory.Exists(uploadDirectory))
-            {
-                Directory.CreateDirectory(uploadDirectory);
-            }
-
-            // Save the file to the server
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await imageFile.CopyToAsync(stream);
-            }
-
-            // Return the file path as a response
-            return Ok(new { filePath });
-        }
+   
 
 
         // Endpoint to retrieve image from the server
