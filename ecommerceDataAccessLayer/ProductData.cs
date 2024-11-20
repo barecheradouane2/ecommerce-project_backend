@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -22,9 +23,32 @@ namespace ecommerceDataAccessLayer
         public int CategoryID { get; set; }
 
         public DateTime CreatedAt { get; set; }
-        public string ProductImage { get; set; }
 
-        // DTO is data what we should return to the client side  we can create create other dto we return
+        public IFormFile ProductImage { get; set; }
+
+        public ProductDTO()
+        {
+
+        }
+            
+
+
+        
+
+        public ProductDTO(int ProductID, string ProductName, string Description, decimal Price, int Discount, int Stock, int CategoryID, DateTime CreatedAt, IFormFile ProductImage)
+        {
+            this.ProductID = ProductID;
+            this.ProductName = ProductName;
+            this.Description = Description;
+            this.Price = Price;
+            this.Discount = Discount;
+            this.Stock = Stock;
+            this.CategoryID = CategoryID;
+            this.CreatedAt = CreatedAt;
+            this.ProductImage= ProductImage;
+
+
+        }
         public  ProductDTO(int ProductID, string ProductName, string Description, decimal Price,int Discount,int Stock ,int CategoryID ,DateTime CreatedAt)
         {
           this.ProductID = ProductID;
@@ -144,6 +168,28 @@ namespace ecommerceDataAccessLayer
             }
 
             return ProductID;
+        }
+
+
+
+        public static int AddNewProductImage(string ImageUrl,int ImageOrder,int ProductID)
+        {
+            int ID = -1;
+
+            using (SqlConnection con = new SqlConnection(_ConnectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("insert into ProductImages(ImageUrl,ImageOrder,ProductID) values(@ImageUrl,@ImageOrder,@ProductID);SELECT SCOPE_IDENTITY();", con))
+                {
+                    cmd.Parameters.AddWithValue("@ImageUrl", ImageUrl);
+                    cmd.Parameters.AddWithValue("@ImageOrder", ImageOrder);
+                    cmd.Parameters.AddWithValue("@ProductID", ProductID);
+                 
+                    con.Open();
+                    ID = Convert.ToInt32(cmd.ExecuteScalar());
+                }
+            }
+
+            return ID;
         }
 
 

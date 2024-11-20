@@ -1,4 +1,5 @@
 ﻿using ecommerceDataAccessLayer;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,8 @@ namespace ecommerceApiBusinessLayer
 
         public DateTime CreatedAt { get; set; }
 
+        public IFormFile ProductImage { get; set; }
+
         public ProductDTO PDTO { 
             get { return  (new ProductDTO(this.ProductID,this.ProductName,this.Description,this.Price,this.Discount,this.Stock,this.CategoryID,this.CreatedAt)); }
         }
@@ -39,13 +42,24 @@ namespace ecommerceApiBusinessLayer
             this.Stock = pDTO.Stock;
             this.CategoryID = pDTO.CategoryID;
             this.CreatedAt = pDTO.CreatedAt;
+            this.ProductImage= pDTO.ProductImage;
+            
 
             Mode = cMode;
         }
 
 
-        private bool _AddNewProduct()
+        private  async Task <bool> _AddNewProduct()
         {
+
+            string path = "";
+            int count = 0;
+
+          
+                path = await UploadImage(this.ProductImage);
+                ProductData.AddNewProductImage(path,count, this.ProductID);
+            
+
             this.ProductID = ProductData.AddNewProduct(this.PDTO);
             return ProductID!=-1;
         }
@@ -79,11 +93,11 @@ namespace ecommerceApiBusinessLayer
           return  ProductData.DeleteProduct(this.ProductID);
         }
 
-        public bool Save()
+        public async Task <bool> Save()
         {
             if (Mode == enMode.AddNew)
             {
-                if (_AddNewProduct())
+                if (await _AddNewProduct())
                 {
                     Mode = enMode.Update;
                     return true;
@@ -101,6 +115,58 @@ namespace ecommerceApiBusinessLayer
 
             return false;
         }
+
+
+
+        public async Task<string> UploadImage(IFormFile imageFile)
+        {
+            // Check if no file is uploaded
+            if (imageFile == null || imageFile.Length == 0)
+                return "";
+
+            // Directory where files will be uploaded
+            var uploadDirectory = @"C:\MyUploads";
+
+            // Generate a unique filename
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+            var filePath = Path.Combine(uploadDirectory, fileName);
+
+            // Ensure the uploads directory exists, create if it doesn't
+            if (!Directory.Exists(uploadDirectory))
+            {
+                Directory.CreateDirectory(uploadDirectory);
+            }
+
+            // Save the file to the server
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await imageFile.CopyToAsync(stream);
+            }
+
+            // Return the file path as a response
+            return filePath;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         //getProduct images 
         // change status

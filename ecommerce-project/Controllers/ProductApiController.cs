@@ -54,7 +54,8 @@ namespace ecommerce_project.Controllers
         [HttpPost( Name = "AddNewProduct")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-      
+        [Consumes()]
+
 
 
         public async Task<ActionResult<ProductDTO>> AddNewProduct([FromForm] ProductDTO NewProductDTO)
