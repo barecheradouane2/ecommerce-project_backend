@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-
+using Microsoft.AspNetCore.Http;
 namespace ecommerce_project.Controllers
 {
     [Route("api/[controller]")]
@@ -54,30 +54,8 @@ namespace ecommerce_project.Controllers
         [HttpPost( Name = "AddNewProduct")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [Consumes()]
-
-
-
-        public async Task<ActionResult<ProductDTO>> AddNewProduct([FromForm] ProductDTO NewProductDTO)
-        {
-            // Validate the ProductDTO
-            if (NewProductDTO == null)
-            {
-                return BadRequest("Product data is required.");
-            }
-
-            if (string.IsNullOrEmpty(NewProductDTO.ProductName))
-            {
-                return BadRequest("Product name is required.");
-            }
-
-            if (NewProductDTO.Stock <= 0)
-            {
-                return BadRequest("Stock must be greater than zero.");
-            }
-
-         
-
+        [Consumes("multipart/form-data")]
+        public async Task< ActionResult<ProductDTO> >AddNewProduct( [FromForm]  ProductDTO NewProductDTO) {
             try
             {
                 // Create a product object
@@ -125,7 +103,7 @@ namespace ecommerce_project.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
 
-        public ActionResult<ProductDTO> UpdateProduct(int id,ProductDTO UpdateProduct)
+        public async Task< ActionResult<ProductDTO>> UpdateProduct(int id,ProductDTO UpdateProduct)
         {
             if (UpdateProduct == null || string.IsNullOrEmpty(UpdateProduct.ProductName) )
             {
@@ -147,7 +125,7 @@ namespace ecommerce_project.Controllers
             product.CreatedAt = UpdateProduct.CreatedAt;
 
            
-            if (product.Save())
+            if ( await product.Save())
             {
                 return Ok(product.PDTO);
             }

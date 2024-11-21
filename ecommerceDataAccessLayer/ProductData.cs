@@ -24,18 +24,17 @@ namespace ecommerceDataAccessLayer
 
         public DateTime CreatedAt { get; set; }
 
-        public IFormFile ProductImage { get; set; }
+        public List<IFormFile> ProductImage { get; set; }
+
 
         public ProductDTO()
         {
+       
 
         }
-            
 
 
-        
-
-        public ProductDTO(int ProductID, string ProductName, string Description, decimal Price, int Discount, int Stock, int CategoryID, DateTime CreatedAt, IFormFile ProductImage)
+        public ProductDTO(int ProductID, string ProductName, string Description, decimal Price, int Discount, int Stock, int CategoryID, DateTime CreatedAt, List<IFormFile> ProductImage)
         {
             this.ProductID = ProductID;
             this.ProductName = ProductName;
@@ -45,10 +44,17 @@ namespace ecommerceDataAccessLayer
             this.Stock = Stock;
             this.CategoryID = CategoryID;
             this.CreatedAt = CreatedAt;
-            this.ProductImage= ProductImage;
+            this.ProductImage = ProductImage;   
 
 
         }
+
+            
+
+
+        
+
+      
         public  ProductDTO(int ProductID, string ProductName, string Description, decimal Price,int Discount,int Stock ,int CategoryID ,DateTime CreatedAt)
         {
           this.ProductID = ProductID;
@@ -170,9 +176,7 @@ namespace ecommerceDataAccessLayer
             return ProductID;
         }
 
-
-
-        public static int AddNewProductImage(string ImageUrl,int ImageOrder,int ProductID)
+        public static int AddNewProductImage(String ImageUrl, int ImageOrder,int ProductID)
         {
             int ID = -1;
 
@@ -183,7 +187,7 @@ namespace ecommerceDataAccessLayer
                     cmd.Parameters.AddWithValue("@ImageUrl", ImageUrl);
                     cmd.Parameters.AddWithValue("@ImageOrder", ImageOrder);
                     cmd.Parameters.AddWithValue("@ProductID", ProductID);
-                 
+                  
                     con.Open();
                     ID = Convert.ToInt32(cmd.ExecuteScalar());
                 }
@@ -191,6 +195,10 @@ namespace ecommerceDataAccessLayer
 
             return ID;
         }
+
+
+
+      
 
 
         public static bool UpdateProduct(ProductDTO product)

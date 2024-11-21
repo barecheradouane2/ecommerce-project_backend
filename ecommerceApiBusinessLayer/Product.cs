@@ -25,8 +25,9 @@ namespace ecommerceApiBusinessLayer
         public int CategoryID { get; set; }
 
         public DateTime CreatedAt { get; set; }
+        public List<IFormFile> ProductImage { get; set; }
 
-        public IFormFile ProductImage { get; set; }
+   
 
         public ProductDTO PDTO { 
             get { return  (new ProductDTO(this.ProductID,this.ProductName,this.Description,this.Price,this.Discount,this.Stock,this.CategoryID,this.CreatedAt)); }
@@ -42,26 +43,35 @@ namespace ecommerceApiBusinessLayer
             this.Stock = pDTO.Stock;
             this.CategoryID = pDTO.CategoryID;
             this.CreatedAt = pDTO.CreatedAt;
+
             this.ProductImage= pDTO.ProductImage;
             
+
+           
+
 
             Mode = cMode;
         }
 
 
-        private  async Task <bool> _AddNewProduct()
-        {
 
-            string path = "";
-            int count = 0;
-
-          
-                path = await UploadImage(this.ProductImage);
-                ProductData.AddNewProductImage(path,count, this.ProductID);
             
 
+
+        private async Task<bool> _AddNewProduct()
+        { 
+
             this.ProductID = ProductData.AddNewProduct(this.PDTO);
-            return ProductID!=-1;
+
+            foreach (var item in this.ProductImage)
+            {
+                string path = await UploadImage(item);
+               ProductData.AddNewProductImage(path, 1, this.ProductID);
+
+            }
+          
+            
+            return ProductID != -1;
         }
 
         private bool _UpdateNewProduct()
@@ -93,11 +103,14 @@ namespace ecommerceApiBusinessLayer
           return  ProductData.DeleteProduct(this.ProductID);
         }
 
-        public async Task <bool> Save()
+
+
+        public async Task< bool> Save()
         {
             if (Mode == enMode.AddNew)
             {
-                if (await _AddNewProduct())
+                if ( await _AddNewProduct())
+
                 {
                     Mode = enMode.Update;
                     return true;
@@ -118,11 +131,12 @@ namespace ecommerceApiBusinessLayer
 
 
 
+
+
         public async Task<string> UploadImage(IFormFile imageFile)
         {
-            // Check if no file is uploaded
-            if (imageFile == null || imageFile.Length == 0)
-                return "";
+            
+
 
             // Directory where files will be uploaded
             var uploadDirectory = @"C:\MyUploads";
