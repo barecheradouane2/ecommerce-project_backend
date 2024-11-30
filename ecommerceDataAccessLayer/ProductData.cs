@@ -24,6 +24,7 @@ namespace ecommerceDataAccessLayer
 
         public DateTime CreatedAt { get; set; }
 
+
         public List<IFormFile> ProductImage { get; set; }
 
 
@@ -51,10 +52,6 @@ namespace ecommerceDataAccessLayer
 
             
 
-
-        
-
-      
         public  ProductDTO(int ProductID, string ProductName, string Description, decimal Price,int Discount,int Stock ,int CategoryID ,DateTime CreatedAt)
         {
           this.ProductID = ProductID;
@@ -195,10 +192,6 @@ namespace ecommerceDataAccessLayer
 
             return ID;
         }
-
-
-
-      
 
 
         public static bool UpdateProduct(ProductDTO product)
