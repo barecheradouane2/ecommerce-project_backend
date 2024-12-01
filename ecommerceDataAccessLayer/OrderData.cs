@@ -454,7 +454,7 @@ namespace ecommerceDataAccessLayer
         }
 
 
-        public static bool UpdateOrder(OrderDTO order)
+        public static bool UpdateOrder(OrderDTO2 order)
         {
             using (SqlConnection con = new SqlConnection(_ConnectionString))
             {
@@ -481,7 +481,7 @@ namespace ecommerceDataAccessLayer
 
 
 
-        public static bool UpdateOrderItem(OrderItemDTO orderItem)
+        public static bool UpdateOrderItem(OrderItemDTO2 orderItem)
         {
             using (SqlConnection con = new SqlConnection(_ConnectionString))
             {
@@ -514,6 +514,8 @@ namespace ecommerceDataAccessLayer
                 }
             }
         }
+
+        
 
         public static bool DeleteOrderItem(int OrderID)
         {

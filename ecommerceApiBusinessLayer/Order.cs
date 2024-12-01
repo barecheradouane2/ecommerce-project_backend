@@ -78,7 +78,7 @@ namespace ecommerceApiBusinessLayer
             this.OrderAddress = oDTO.OrderAddress;
             this.DiscountCodeID = oDTO.DiscountCodeID;
             this.ShippingID = oDTO.ShippingID;
-            List<OrderItemDTO> orderItems = oDTO.OrderItems;
+            this.OrderItems = oDTO.OrderItems;
             this.ShippingStatus = oDTO.ShippingStatus;
 
 
@@ -134,7 +134,8 @@ namespace ecommerceApiBusinessLayer
         {
             foreach(var item in this.OrderItems)
             {
-                OrderData.DeleteOrderItem(item.OrderItemID);
+                
+                OrderData.DeleteOrderItem(item.OrderID);
             }
 
             return OrderData.DeleteOrder(this.OrderID);
@@ -160,7 +161,29 @@ namespace ecommerceApiBusinessLayer
 
         private bool _UpdateOrder()
         {
-            return OrderData.UpdateOrder(this.ODTO);
+            /* OrderDTO neworder = new OrderDTO();
+
+              neworder.OrderID = this.OrderID;
+              neworder.OrderDate = this.OrderDate;
+              neworder.TotalAmount = this.TotalAmount;
+              neworder.OrderStatus = this.OrderStatus;
+              neworder.FullName = this.FullName;
+              neworder.Telephone = this.Telephone;
+              neworder.Wilaya = this.Wilaya;
+              neworder.Commune = this.Commune;
+              neworder.OrderAddress = this.OrderAddress;
+              neworder.DiscountCodeID = this.DiscountCodeID;
+              neworder.ShippingID = this.ShippingID;
+              neworder.ShippingStatus = this.ShippingStatus;
+              neworder.OrderItems = this.OrderItems; */
+
+            foreach (var item in this.OrderItems2)
+            {
+             
+                OrderData.UpdateOrderItem(item);
+            }
+
+            return OrderData.UpdateOrder(this.ODTO2);
         }
 
 
